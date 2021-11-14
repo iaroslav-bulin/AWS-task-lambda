@@ -25,4 +25,4 @@ jobs:
       # Build using SAM
       - run: sam build
       # Deploy on AWS
-      - run: sam deploy
+      - run: sam deploy --stack-name aws-task-stack

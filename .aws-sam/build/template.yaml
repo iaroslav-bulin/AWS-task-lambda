@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: AWS Task Lambda application.
+Resources:
+  function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: AWSLoggerLambda::AWSLoggerLambda.Function::FunctionHandler
+      Runtime: dotnetcore3.1
+      CodeUri: ../../bin/Release/netcoreapp3.1/AWSLoggerLambda.zip
+      Description: Call the AWS Lambda API
+      MemorySize: 256
+      Timeout: 9
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+      Tracing: Active

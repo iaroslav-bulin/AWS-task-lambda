@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "aws-task-stack"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-15xv0n8kt7y4g"
+s3_prefix = "aws-task-stack"
+region = "us-east-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
