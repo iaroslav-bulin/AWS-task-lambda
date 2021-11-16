@@ -98,7 +98,7 @@ namespace AWSLoggerLambda
                         };
                         await s3client.PutObjectAsync(req);
                     }
-                    context.Logger.LogLine($"Processed message {message.Body}");
+                    context.Logger.LogLine($"(message.Body) -> {message.Body}");
                 }
         }
     }

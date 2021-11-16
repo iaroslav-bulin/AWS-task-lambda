@@ -2,10 +2,10 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "aws-task-stack"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-15xv0n8kt7y4g"
-s3_prefix = "aws-task-stack"
+stack_name = "aws-task-stack-2"
+s3_bucket = "logstorage"
+s3_prefix = "aws-task-stack-2"
 region = "us-east-2"
-confirm_changeset = true
+confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
 image_repositories = []
