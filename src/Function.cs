@@ -19,10 +19,8 @@ namespace AWSLoggerLambda
 {
     public class Function
     {
-        //private readonly string _bucketName = "loggerstorage";
         private readonly string _bucketName = "stack-logstorage";
 
-        //private readonly string _queueName = "SqsLoggerQueue";
         private readonly string _queueName = "stack-sqsloggerqueue";
 
         /// <summary>
@@ -65,26 +63,25 @@ namespace AWSLoggerLambda
                 {
                     throw new AmazonS3Exception($"bucket - {_bucketName} doesnt exist");
                 }
-                //----
-                //AmazonSQSClient sqsClient = new AmazonSQSClient();
-                //var queueUrlResp = await sqsClient.GetQueueUrlAsync(_queueName);
-                //context.Logger.LogLine($"queueUrlResp.QueueUrl = {queueUrlResp.QueueUrl}");
-                //context.Logger.LogLine($"message.ReceiptHandle = {message.ReceiptHandle}");
-                //try
-                //{
-                //    var deleteMsgResp = await sqsClient.DeleteMessageAsync(queueUrlResp.QueueUrl, message.ReceiptHandle);
 
-                //    if (deleteMsgResp.HttpStatusCode != System.Net.HttpStatusCode.OK)
-                //    {
-                //        context.Logger.LogLine($"Failed to delete message {message.ReceiptHandle} from queue {_queueName}");
-                //    }
-                //}
-                //catch (Exception e)
-                //{
-                //    context.Logger.LogLine(e.Message);
-                //}
+                AmazonSQSClient sqsClient = new AmazonSQSClient();
+                var queueUrlResp = await sqsClient.GetQueueUrlAsync(_queueName);
+                context.Logger.LogLine($"queueUrlResp.QueueUrl = {queueUrlResp.QueueUrl}");
+                context.Logger.LogLine($"message.ReceiptHandle = {message.ReceiptHandle}");
+                try
+                {
+                    var deleteMsgResp = await sqsClient.DeleteMessageAsync(queueUrlResp.QueueUrl, message.ReceiptHandle);
 
-                //-----
+                    if (deleteMsgResp.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        context.Logger.LogLine($"Failed to delete message {message.ReceiptHandle} from queue {_queueName}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    context.Logger.LogLine(e.Message);
+                }
+
                 using (var newMemoryStream = new MemoryStream())
                     {
                         var logDataArr = Encoding.Unicode.GetBytes(logData);

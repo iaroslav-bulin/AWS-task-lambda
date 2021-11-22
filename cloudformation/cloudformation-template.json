@@ -1,0 +1,68 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "LambdaLogProcessor": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Handler": "AWSLoggerLambda::AWSLoggerLambda.Function::FunctionHandler",
+                "Runtime": "dotnetcore3.1",
+                "Code": {
+                    "S3Bucket": "loggerstorage",
+                    "S3Key": "aws-task-lambda.zip"
+                },
+                "Description": "",
+                "MemorySize": 256,
+                "Timeout": 15,
+                "Role": "arn:aws:iam::375297447026:role/service-role/LogProcessorLambda-role-cw3e6ay0",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-003a584ce7c13e0f0"
+                    ],
+                    "SubnetIds": [
+                        "subnet-05e6ae0144771ea74",
+                        "subnet-0147807a062333027",
+                        "subnet-0c0ef4fd49f6d3a4b"
+                    ]
+                },
+                "Tags": [{
+                        "Key": "Name",
+                        "Value": "LambdaLogProcessor"
+                    }
+                ],
+                "FunctionName": "stack-logprocessorlambda",
+                "PackageType": "Zip"
+            },
+            "DependsOn": [
+                "S3LogStorage",
+                "SQSLogger",
+                "S3SrcStorage"
+            ]
+        },
+        "LambdaSqsTrigger": {
+            "Type": "AWS::Lambda::EventSourceMapping",
+            "Properties": {
+                "Enabled": true,
+                "EventSourceArn": {
+                    "Fn::GetAtt": [
+                        "SQSLogger",
+                        "Arn"
+                    ]
+                },
+                "FunctionName": {
+                    "Ref": "LambdaLogProcessor"
+                }
+            }
+        },
+        "S3SrcStorage": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "Tags": [{
+                        "Key": "Name",
+                        "Value": "S3SrcStorage"
+                    }
+                ],
+                "BucketName": "stack-srcstorage"
+            }
+        }
+    }
+}
