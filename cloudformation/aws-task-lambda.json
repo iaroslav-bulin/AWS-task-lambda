@@ -1,5 +1,15 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "NetworkStackName": {
+            "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "aws-task-infrastructure"
+        }
+    },
     "Resources": {
         "LambdaLogProcessor": {
             "Type": "AWS::Lambda::Function",
@@ -7,8 +17,12 @@
                 "Handler": "AWSLoggerLambda::AWSLoggerLambda.Function::FunctionHandler",
                 "Runtime": "dotnetcore3.1",
                 "Code": {
-                    "S3Bucket": "loggerstorage",
-                    "S3Key": "aws-task-lambda.zip"
+                    "S3Bucket": {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-S3SrcStorage"
+                        }
+                    },
+                    "S3Key": "AWSLoggerLambda.zip"
                 },
                 "Description": "",
                 "MemorySize": 256,
@@ -16,12 +30,14 @@
                 "Role": "arn:aws:iam::375297447026:role/service-role/LogProcessorLambda-role-cw3e6ay0",
                 "VpcConfig": {
                     "SecurityGroupIds": [
-                        "sg-003a584ce7c13e0f0"
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-SecurityGroupID"
+                        }
                     ],
                     "SubnetIds": [
-                        "subnet-05e6ae0144771ea74",
-                        "subnet-0147807a062333027",
-                        "subnet-0c0ef4fd49f6d3a4b"
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-SubnetID"
+                        }
                     ]
                 },
                 "Tags": [{
@@ -33,9 +49,7 @@
                 "PackageType": "Zip"
             },
             "DependsOn": [
-                "S3LogStorage",
-                "SQSLogger",
-                "S3SrcStorage"
+                "SQSLogger"
             ]
         },
         "LambdaSqsTrigger": {
@@ -53,15 +67,15 @@
                 }
             }
         },
-        "S3SrcStorage": {
-            "Type": "AWS::S3::Bucket",
+        "SQSLogger": {
+            "Type": "AWS::SQS::Queue",
             "Properties": {
                 "Tags": [{
                         "Key": "Name",
-                        "Value": "S3SrcStorage"
+                        "Value": "SQSLogger"
                     }
                 ],
-                "BucketName": "stack-srcstorage"
+                "QueueName": "stack-sqsloggerqueue"
             }
         }
     }
