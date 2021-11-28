@@ -6,6 +6,9 @@ on:
 jobs:
   deploy-lambda:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src
     steps:
       - uses: actions/checkout@v2
       - name: Setup dotnet
@@ -15,9 +18,7 @@ jobs:
       - name: AWS CLI
         run: dotnet tool install -g Amazon.Lambda.Tools
       - name: Restore dependencies
-        run: |
-          cd src 
-          dotnet restore
+        run: dotnet restore
       - name: Build
         run: dotnet build
       - uses: aws-actions/setup-sam@v1
@@ -27,7 +28,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       # Build using SAM
-      - run: sam build -t .aws-sam/build/template.yaml
+      - run: sam build -t ../.aws-sam/build/template.yaml
       # Deploy on AWS
       - run: dotnet lambda deploy-function stack-logprocessorlambda      
 
