@@ -15,7 +15,9 @@ jobs:
       - name: AWS CLI
         run: dotnet tool install -g Amazon.Lambda.Tools
       - name: Restore dependencies
-        run: dotnet restore
+        run: |
+          cd src 
+          dotnet restore
       - name: Build
         run: dotnet build
       - uses: aws-actions/setup-sam@v1
